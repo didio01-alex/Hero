@@ -5,6 +5,7 @@ import { ArrowRight, Mail, MapPin, Sparkles } from 'lucide-react'
 import { PROFILE } from './data'
 import { Reveal } from './reveal'
 import MatrixBackground from './matrix-background'
+import { useEffect, useRef, useState } from 'react'
 
 export function Hero() {
   return (
@@ -27,7 +28,7 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[auto_1fr] lg:gap-16">
         {/* Photo */}
-        <Reveal className="order-1 mx-auto flex justify-center lg:order-none">
+        <Reveal className="order-1 mx-auto flex justify-center lg:order-none" delay={100}>
           <div className="relative">
             <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-primary via-violet to-cyan opacity-70 blur-xl" />
 
@@ -50,7 +51,7 @@ export function Hero() {
         </Reveal>
 
         {/* Texte */}
-        <Reveal className="text-center lg:text-left">
+        <Reveal className="text-center lg:text-left" delay={200}>
           <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-3.5 py-1.5 text-sm font-medium text-slate-200 shadow-sm backdrop-blur">
             <Sparkles className="size-4 text-blue-400" />
             Profil hybride Droit & Technologie
@@ -66,9 +67,7 @@ export function Hero() {
             </span>
           </h1>
 
-          <p className="mt-4 font-heading text-lg font-semibold text-slate-100 sm:text-xl">
-            {PROFILE.title}
-          </p>
+          <TerminalSubtitle />
 
           <p className="mx-auto mt-5 max-w-xl leading-relaxed text-slate-300 lg:mx-0">
             À l'intersection du droit, de la politique et des technologies
@@ -103,5 +102,48 @@ export function Hero() {
         </Reveal>
       </div>
     </section>
+  )
+}
+
+function TerminalSubtitle() {
+  const lines = [
+    PROFILE.title,
+    "Passionné par l'IA et la Cybersécurité",
+  ]
+  const [text, setText] = useState('')
+  const [lineIndex, setLineIndex] = useState(0)
+  const [charIndex, setCharIndex] = useState(0)
+
+  useEffect(() => {
+    let mounted = true
+    const currentLine = lines[lineIndex % lines.length]
+
+    if (charIndex <= currentLine.length && mounted) {
+      const t = setTimeout(() => {
+        setText(currentLine.slice(0, charIndex))
+        setCharIndex((c) => c + 1)
+      }, 45)
+      return () => clearTimeout(t)
+    }
+
+    const pause = setTimeout(() => {
+      setCharIndex(0)
+      setLineIndex((i) => i + 1)
+    }, 1400)
+
+    return () => {
+      clearTimeout(pause)
+      mounted = false
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [charIndex, lineIndex])
+
+  return (
+    <div className="mt-4">
+      <div className="font-heading text-lg font-semibold text-slate-100 sm:text-xl">
+        <span className="terminal-text">{text}</span>
+        <span className="terminal-cursor inline-block ml-1 h-6 w-1 bg-slate-100 animate-blink" />
+      </div>
+    </div>
   )
 }
